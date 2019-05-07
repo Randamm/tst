@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -44,11 +45,14 @@ public class UserAccountDaoTest {
     @Test(expected=IllegalArgumentException.class)
     public void nullCreateThrowsException() {
         new UserAccountDAOImpl(db).addUserAccount(null);
+        verifyZeroInteractions(connection);
     }
 
     @Test
-    public void createPerson(){
+    public void createPerson() throws SQLException {
         new UserAccountDAOImpl(db).addUserAccount(userAccount);
+        verify(preparedStatement).setString(1, userAccount.getUsername());
+        verify(preparedStatement).setString(2, userAccount.getSurname());
     }
 
     @Test
@@ -57,5 +61,14 @@ public class UserAccountDaoTest {
         userAccountDAO.addUserAccount(userAccount);
         UserAccount actual = userAccountDAO.findUserAccountByUsername(userAccount.getUsername());
         assertEquals(userAccount, actual);
+    }
+
+    @Test
+    public void updateSurname() throws SQLException {
+        UserAccountDAO userAccountDAO = new UserAccountDAOImpl(db);
+        userAccountDAO.addUserAccount(userAccount);
+        assertEquals(true,userAccountDAO.updateSurname(userAccount.getUsername(),"tst"));
+        verify(preparedStatement).setString(1, "tst");
+        verify(preparedStatement).setString(2, userAccount.getUsername());
     }
 }

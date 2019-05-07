@@ -46,7 +46,7 @@ public class UserAccountDAOImpl implements UserAccountDAO {
         return null;
     }
 
-    public void updateSurname(String username, String newSurname) {
+    public boolean updateSurname(String username, String newSurname) {
         String query = "UPDATE useraccount SET surname =? WHERE username=?";
 
         try {
@@ -56,8 +56,10 @@ public class UserAccountDAOImpl implements UserAccountDAO {
             preparedStatement.setString(2, username);
 
             preparedStatement.executeUpdate();
+            return true;
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
+            return false;
         }
 
     }
